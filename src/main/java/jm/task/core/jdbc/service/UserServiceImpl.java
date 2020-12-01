@@ -13,12 +13,13 @@ public class UserServiceImpl extends Util implements UserService {
 
     public void createUsersTable() {
         String createUsersTable = "CREATE TABLE IF NOT EXISTS users (id INTEGER AUTO_INCREMENT PRIMARY KEY, \n" +
-                "    firstName VARCHAR(30), \n" +
+                "    name VARCHAR(30), \n" +
                 "    lastName VARCHAR(30),\n" +
                 "    age INTEGER\n" +
                 ");";
         try (PreparedStatement preparedStatement = connection.prepareStatement(createUsersTable)) {
             preparedStatement.execute();
+            System.out.println("Таблица в базе данных успешно создана.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -28,18 +29,20 @@ public class UserServiceImpl extends Util implements UserService {
         String drop = "DROP TABLE IF EXISTS users";
         try (PreparedStatement preparedStatement = connection.prepareStatement(drop)) {
             preparedStatement.execute();
+            System.out.println("Таблица успешно удалена.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String saveUser = "INSERT INTO users (firstName, lastName, age) Values (?, ?, ?)";
+        String saveUser = "INSERT INTO users (name, lastName, age) Values (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(saveUser)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
             preparedStatement.executeUpdate();
+            System.out.println("User с именем " + name + " добавлен в базу данных.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -51,6 +54,7 @@ public class UserServiceImpl extends Util implements UserService {
             PreparedStatement preparedStatement = connection.prepareStatement(removeUserById);
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
+            System.out.println("User с id: " + id + " успешно удален с базы данных.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -66,12 +70,12 @@ public class UserServiceImpl extends Util implements UserService {
 
             while (resultSet.next()) {
                 User user = new User();
-                user.setId(resultSet.getLong(1));
-                user.setName(resultSet.getString(2));
-                user.setLastName(resultSet.getString(3));
-                user.setAge(resultSet.getByte(4));
-
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("lastName"));
+                user.setAge(resultSet.getByte("age"));
                 userList.add(user);
+                System.out.println(user);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -84,6 +88,7 @@ public class UserServiceImpl extends Util implements UserService {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(cleanUsersTable);
             preparedStatement.execute();
+            System.out.println("Таблица очищена.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
